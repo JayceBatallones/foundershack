@@ -10,7 +10,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../../foundershack/bb-foundershack/src/components/ui/card";
+} from "@/components/ui/card";
 import { Button, buttonVariants } from "./ui/button";
 
 import { MathJaxHtml } from "mathjax3-react";
@@ -141,6 +141,24 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
   }, [handleNextButton]);
 
   const [now, setNow] = React.useState(new Date());
+
+
+  if (hasEnded) {
+    return (
+      <div className="absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+        <div className="px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
+          You Completed in{" "}
+          {formatTimeDelta(differenceInSeconds(now, attempt.timeStarted))}
+        </div>
+        <Button
+          className={cn(buttonVariants({ size: "lg" }), "mt-2")}
+        >
+          View Statistics
+          <BarChart className="w-4 h-4 ml-2" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-between h-screen">
