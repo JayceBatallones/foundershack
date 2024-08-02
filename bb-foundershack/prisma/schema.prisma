@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId       String         @id @default(cuid())
+  clerkId      String?        @unique
+  email        String         @unique
+  name         String?
+  lastName     String?
+  paid         Boolean        @default(false)
+  lastQuizDone DateTime       @default(now()) @db.Date
+  streak       Int            @default(0) @db.SmallInt
+  Attempt      Attempt[]
+  QuizToUser   QuizToUser[]
+  UserPathways UserPathways[]
+}
+
+model Quiz {
+  quizId             Int                  @id @default(autoincrement())
+  name               String               @unique
+  duration           Int
+  maxScore           Int
+  Attempt            Attempt[]
+  QuizToUser         QuizToUser[]
+  TestQuestionToQuiz TestQuestionToQuiz[]
+}
+
+model Attempt {
+  attemptId       String       @id @default(cuid())
+  quizId          Int
+  userId          String
+  currentQuestion Int
+  isComplete      Boolean
+  answers         String[]
+  timeEnded       DateTime?    @db.Timestamptz(6)
+  timeStarted     DateTime     @db.Timestamptz(6)
+  quiz            Quiz         @relation(fields: [quizId], references: [quizId], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  Statistics      Statistics[]
+
+  @@index([quizId])
+  @@index([userId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TestQuestion {
+  QuestionID             String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Description            String
+  Explanation            String?
+  CorrectAnswer          String?
+  Choices                Json?                    @db.Json
+  ChoicesContainsDesc    Boolean?
+  ChoicesContainsImage   Boolean?
+  Duration               Int?
+  Subject                String?
+  Topic                  String?
+  SubTopic               String?
+  Skill                  String?
+  Difficulty             String?
+  Opportunity            String?
+  created_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  SkillToTestQuestion    SkillToTestQuestion[]
+  SubTopicToTestQuestion SubTopicToTestQuestion[]
+  TestQuestionToQuiz     TestQuestionToQuiz[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TestQuestionToQuiz {
+  QuizToQuestionID String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  QuestionID       String       @db.Uuid
+  QuizID           Int
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  TestQuestion     TestQuestion @relation(fields: [QuestionID], references: [QuestionID], onDelete: Cascade)
+  Quiz             Quiz         @relation(fields: [QuizID], references: [quizId], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model QuizToUser {
+  userId       Int
+  quizId       String
+  quizToUserId Int    @id(map: "_QuizToUser_pkey")
+  Quiz         Quiz   @relation(fields: [userId], references: [quizId], onDelete: Cascade, map: "_QuizToUser_A_fkey")
+  User         User   @relation(fields: [quizId], references: [userId], onDelete: Cascade, map: "_QuizToUser_B_fkey")
+
+  @@unique([userId, quizId], map: "_QuizToUser_AB_unique")
+  @@index([quizId], map: "_QuizToUser_B_index")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Statistics {
+  statisticsID String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  attemptId    String
+  percentage   Float    @db.Real
+  topics       Json?    @db.Json
+  timeTaken    DateTime @db.Time(6)
+  subTopics    Json?    @db.Json
+  Attempt      Attempt  @relation(fields: [attemptId], references: [attemptId], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Pathways {
+  pathwayId    String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String         @unique
+  description  String         @unique
+  nodes        Json           @db.Json
+  created_at   DateTime       @default(now()) @db.Timestamptz(6)
+  UserPathways UserPathways[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserPathways {
+  userPathwayId String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String
+  pathwayId     String   @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  currentNode   Json     @db.Json
+  Pathways      Pathways @relation(fields: [pathwayId], references: [pathwayId], onDelete: Cascade, onUpdate: NoAction)
+  User          User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Skill {
+  skillId             String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  name                String                @unique(map: "Skill_skill_name_key")
+  difficulty          String?
+  yearLevel           String
+  SkillToTestQuestion SkillToTestQuestion[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SkillToTestQuestion {
+  skillToTestQuestionId String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt             DateTime     @default(now()) @db.Timestamptz(6)
+  skillId               String       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  questionId            String       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  TestQuestion          TestQuestion @relation(fields: [questionId], references: [QuestionID], onDelete: Cascade)
+  Skill                 Skill        @relation(fields: [skillId], references: [skillId], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SubTopic {
+  subTopicId             String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
+  name                   String                   @unique
+  description            String?
+  SubTopicToTestQuestion SubTopicToTestQuestion[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SubTopicToTestQuestion {
+  subTopicToTestQuestionId String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt                DateTime      @default(now()) @db.Timestamptz(6)
+  subTopicId               String?       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  questionId               String?       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  TestQuestion             TestQuestion? @relation(fields: [questionId], references: [QuestionID], onDelete: Cascade)
+  SubTopic                 SubTopic?     @relation(fields: [subTopicId], references: [subTopicId], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Topic {
+  topicId     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  topicName   String   @unique(map: "Topic_topic_name_key")
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  description String?
+  resources   String[]
+}
