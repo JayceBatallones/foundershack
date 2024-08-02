@@ -9,6 +9,7 @@ import {
 } from "../../../../../foundershack/bb-foundershack/src/components/ui/card";
 import { Button } from "../ui/button";
 import axios, { AxiosError } from "axios";
+import LoadingQuestions from "../LoadingQuestions";
 
 type Quiz = {
   quizId: number;
@@ -36,9 +37,13 @@ const QuizCreation: React.FC<QuizCreationProps> = ({ quizList }) => {
     "xl:grid-cols-5",
   ];
 
-  //   to get right amount of grid cols to fit on the screen (centers if theres less than 5)
+  const [showLoader, setShowLoader] = React.useState(false);
+  const [finishedLoading, setFinishedLoading] = React.useState(false);
+  const { toast } = useToast();
+
+//   to get right amount of grid cols to fit on the screen (centers if theres less than 5)
   // can change this to sm, md, lg later
-  const getGridColsClass = (numItems: number) => {
+const getGridColsClass = (numItems: number) => {
     if (numItems >= 5) return gridColumns.join(" ");
     return gridColumns.slice(0, numItems).join(" ");
   };
@@ -50,11 +55,42 @@ const QuizCreation: React.FC<QuizCreationProps> = ({ quizList }) => {
     },
   });
 
+  const onSubmit = async (quizId: number) => {
+    setShowLoader(true);
+    createAttempt(quizId, {
+      onError: (error) => {
+        setShowLoader(false);
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 500) {
+            toast({
+              title: "Error",
+              description: "Something went wrong. Please try again later.",
+              variant: "destructive",
+            });
+          }
+        }
+      },
+      onSuccess: ({ attemptId }: { attemptId: string }) => {
+
+        setFinishedLoading(true);
+        setTimeout(() => {
+          router.push(`play/mcq/${attemptId}`)
+        }, 2000);
+      },
+    });
+  };
+
+  if (showLoader) {
+    return <LoadingQuestions finished={finishedLoading}/>
+  }
+  
+  
+
   return (
     <div className="flex justify-center items-center h-[calc(100vh-56px)]">
       <div
         className={`grid gap-6 p-4 ${getGridColsClass(quizList.length)}`}
-        style={{ justifyItems: "center" }}
+        style={{ justifyItems: 'center' }}
       >
         {quizList.map((quiz) => (
           <Card
@@ -65,15 +101,13 @@ const QuizCreation: React.FC<QuizCreationProps> = ({ quizList }) => {
               <CardTitle className="text-wrap text-xl font-bold">
                 {quiz.name}
               </CardTitle>
-              <CardDescription>
-                Duration: {quiz.duration} minutes
-              </CardDescription>
-              <CardDescription>
-                Questions: {quiz.maxScore} questions
-              </CardDescription>
+              <CardDescription>Duration: {quiz.duration} minutes</CardDescription>
+              <CardDescription>Questions: {quiz.maxScore} questions</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button disabled={isLoading}>Start</Button>
+              <Button
+              disabled={isLoading}
+              onClick={() => onSubmit(quiz.quizId)}>Start</Button>
             </CardContent>
           </Card>
         ))}
