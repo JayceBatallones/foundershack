@@ -13,6 +13,7 @@ import {
 import { Prisma } from "@prisma/client";
 import { MathJaxHtml } from "mathjax3-react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import ExpandButton from "@/components/statistics/ExpandButton";
 
 type Props = {
   attempt: {
@@ -77,7 +78,7 @@ const QuestionsList = ({ attempt, testQuestion }: Props) => {
                       {userAnswer}
                     </TableCell>
                     <TableCell>
-                      <span>Expand</span>
+                      <ExpandButton index={index}></ExpandButton>
                     </TableCell>
                   </TableRow>
                   <CollapsibleContent asChild>
