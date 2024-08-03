@@ -129,6 +129,13 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
   }, [saveAnswer, questionIndex, testQuestion.length, endGame]); 
 
 
+    // handleStatisticsButton
+    const handleStatisticsButton = React.useCallback(() => {
+      if (statistics) {
+        router.push(`/statistics/${statistics}`);
+      }
+    }, [statistics, router]);
+
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key;
@@ -166,6 +173,7 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
           {formatTimeDelta(differenceInSeconds(now, attempt.timeStarted))}
         </div>
         <Button
+        onClick={handleStatisticsButton}
           className={cn(buttonVariants({ size: "lg" }), "mt-2")}
         >
           View Statistics
