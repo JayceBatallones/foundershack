@@ -39,7 +39,24 @@ const ClientPathwayRenderer = ({
   const [currentTopicIndex, setCurrentTopicIndex] = useState(initialTopicIndex);
   const [currentQuetionIndex, setCurrentQuetionIndex] = useState(initialQuestionIndex);
 
- 
+  const handleRendererLoadComplete = async () => {
+    
+    const payload: z.infer<typeof getCurrentNodeSchema> = {
+      userPathwayId: userPathwayId,
+    };
+    try {
+      const response = await axios.post(`/api/getCurrentNode`, payload);
+      const newTopicIndex = topicMap[response.data.currentNode["topic"]];
+      const newQuestionIndex = response.data.currentNode["index"];
+
+      setCurrentTopicIndex(newTopicIndex);
+      setCurrentQuetionIndex(newQuestionIndex);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setCurrentRendererIndex(currentRendererIndex + 1);
+  };
 
   return (
     <div>
@@ -49,7 +66,14 @@ const ClientPathwayRenderer = ({
             <>
               <PathwayBanner title={key} description={`${values.length} items`} />
               <div>
-                test
+                <PathwayButtonRenderer
+                  initialNodes={values as Array<any>}
+                  currentTopicIndex={currentTopicIndex}
+                  currentQuestionIndex={currentQuetionIndex}
+                  topicMap={topicMap}
+                  userPathwayId={userPathwayId}
+                  onLoadComplete={handleRendererLoadComplete} // Pass the callback
+                />
               </div>
             </>
           )}
