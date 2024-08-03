@@ -6,6 +6,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@clerk/nextjs/server";
+import ResultsCard from "@/components/statistics/ResultsCard";
+import AccuracyCard from "@/components/statistics/AccuracyCard";
+import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -85,7 +88,12 @@ const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
           </div>
         </div>
 
-        <div className="grid gap-4 mt-4 md:grid-cols-7"></div>
+        <div className="grid gap-4 mt-4 md:grid-cols-7">
+          <ResultsCard accuracy={statistics.percentage} />
+          <AccuracyCard accuracy={statistics.percentage} />
+          <TimeTakenCard timeTaken={statistics.timeTaken} />
+        </div>
+        <Tabs defaultValue="stats" className="mt-8"></Tabs>
       </div>
     </>
   );
