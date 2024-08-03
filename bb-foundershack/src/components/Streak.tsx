@@ -11,7 +11,7 @@ const Streak = async (props: Props) => {
   const { userId } = auth();
 
   if (!userId) {
-    return redirect("/");
+    return (<div></div>)
   }
 
   let streak = 0;
