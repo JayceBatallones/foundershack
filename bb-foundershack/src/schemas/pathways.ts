@@ -23,3 +23,8 @@ export const checkCorrectAnswersSchema = z.object({
 export const getCurrentNodeSchema = z.object({
     userPathwayId: z.string()
 })
+
+export const createPathwayQuizSchema = z.object({
+    type: z.enum(["topics", "subTopics", "skills"]),
+    name: z.string(),
+})
