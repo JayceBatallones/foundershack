@@ -2,6 +2,8 @@
 import React from "react";
 import { Prisma } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TopicGraph from "@/components/statistics/graphs/TopicGraph"
+import SubTopicGraph from "@/components/statistics/graphs/SubTopicGraph"
 
 type Props = {
   statistics: {
@@ -14,15 +16,21 @@ type Props = {
   };
 };
 
+
 const StatisticsGraphs = ({ statistics }: Props) => {
   return (
-    <Tabs defaultValue="topics">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="topics">Topics</TabsTrigger>
-        <TabsTrigger value="subTopics">Sub Topics</TabsTrigger>
-      </TabsList>
-      <TabsContent value="topics"></TabsContent>
-      <TabsContent value="subTopics"></TabsContent>
+    <Tabs defaultValue="topics"> 
+        <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="topics">Topics</TabsTrigger>
+            <TabsTrigger value="subTopics">Sub Topics</TabsTrigger>
+          </TabsList>
+          <TabsContent value="topics">
+            <TopicGraph statistics={statistics} />
+          </TabsContent>
+          <TabsContent value="subTopics">
+            <SubTopicGraph statistics={statistics} />
+          </TabsContent>
+
     </Tabs>
   );
 };
