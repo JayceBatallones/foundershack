@@ -32,7 +32,6 @@ model Quiz {
 }
 
 model Attempt {
-  attemptId       String       @id @default(cuid())
   quizId          Int
   userId          String
   currentQuestion Int
@@ -40,6 +39,7 @@ model Attempt {
   answers         String[]
   timeEnded       DateTime?    @db.Timestamptz(6)
   timeStarted     DateTime     @db.Timestamptz(6)
+  attemptId       String       @id @default(dbgenerated("gen_random_uuid()"))
   quiz            Quiz         @relation(fields: [quizId], references: [quizId], onDelete: Cascade)
   user            User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
   Statistics      Statistics[]
@@ -100,7 +100,8 @@ model Statistics {
   topics       Json?    @db.Json
   timeTaken    DateTime @db.Time(6)
   subTopics    Json?    @db.Json
-  Attempt      Attempt  @relation(fields: [attemptId], references: [attemptId], onDelete: Cascade, onUpdate: NoAction)
+  skills       Json?    @db.Json
+  Attempt      Attempt  @relation(fields: [attemptId], references: [attemptId], onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -150,6 +151,7 @@ model SubTopic {
   createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
   name                   String                   @unique
   description            String?
+  yearLevel              String
   SubTopicToTestQuestion SubTopicToTestQuestion[]
 }
 
@@ -166,7 +168,7 @@ model SubTopicToTestQuestion {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Topic {
   topicId     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  topicName   String   @unique(map: "Topic_topic_name_key")
+  name        String   @unique(map: "Topic_topic_name_key")
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
   description String?
   resources   String[]
