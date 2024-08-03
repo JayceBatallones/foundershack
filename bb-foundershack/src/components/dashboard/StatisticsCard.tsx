@@ -8,7 +8,7 @@ type Props = {
 };
 
 const StatisticsCard = (userId: Props) => {
-    console.log(userId)
+
   const router = useRouter();
   return (
     <Card

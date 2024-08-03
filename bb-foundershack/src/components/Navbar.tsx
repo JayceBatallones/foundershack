@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import logo from "logo.svg"
 
 type Props = {};
 
@@ -16,9 +17,8 @@ const Navbar = async () => {
       <div className="flex items-center justify-between h-full gap-2 px-8 mx-auto max-w-7xl">
         {/* Logo */}
         <Link href={"/"} className="flex items-center gap-2">
-          <p className="rounded-lg border-2 border-b-4 border-r-4 border-black px-2 py-1 text-xl font-bold transition-all hover:-translate-y-[2px] md:block dark:border-white">
-            Big Brain
-          </p>
+        <img src="/logo.svg" alt="Big Brain Logo" className="w-50 h-50" />
+
         </Link>
 
         <div className="flex item-center gap-4">
