@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Streak from "@/components/Streak";
 
 type Props = {};
 
@@ -21,6 +22,7 @@ const Navbar = async () => {
         </Link>
 
         <div className="flex item-center gap-4">
+          <Streak />
           <ThemeToggle />
           <SignedOut>
             <SignInButton>
