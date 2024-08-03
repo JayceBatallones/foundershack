@@ -99,7 +99,7 @@ let percentage: number;
             <div className="h-[102px] w-[102px] relative">
               <div
                 className="absolute -top-6 left-2.5 px-3 py-2.5 border-2
-            font-bold uppercase text-green-500 bg-white rounded-xl
+            font-bold uppercase text-blue-500 bg-white rounded-xl
             animate-bounce tracking-wide z-10"
               >
                 Start
@@ -125,13 +125,16 @@ let percentage: number;
                     size="rounded"
                     className="h-[70px] w-[70px] border-b-8"
                     variant={node.isLocked ? "locked" : "secondaryPathways"}
+                    onClick={()=>{
+                        console.log("hello")
+                    }}
                   >
                     <Icon
                       className={cn(
                         "h-10 w-10",
                         node.isLocked
-                          ? "fill-neutral-400 text-neutral-400 stroke-neutral-400"
-                          : "fill-primary-foreground text-primary-foreground",
+                          ? "fill-neutral-300 text-neutral-300 stroke-neutral-300"
+                          : "fill-neutral-300 text-neutral-300 stroke-neutral-300",
                         isCompleted && "fill-none stroke-[4]"
                       )}
                     />
@@ -150,9 +153,9 @@ let percentage: number;
               <Icon
                 className={cn(
                   "h-10 w-10",
-                  node["isLocked"]
+                  node.isLocked
                     ? "fill-neutral-400 text-neutral-400 stroke-neutral-400"
-                    : "fill-primary-foreground text-primary-foreground",
+                    : "fill-neutral-300 text-neutral-300 stroke-neutral-300",
                   isCompleted && "fill-none stroke-[4]"
                 )}
               />
