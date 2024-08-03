@@ -18,6 +18,7 @@ import axios from "axios";
 import { z } from "zod";
 import { addAnswerSchema } from "@/schemas/quiz";
 import { useMutation } from "@tanstack/react-query";
+import { statsSchema } from "@/schemas/stats";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -86,6 +87,19 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
     },
   });
 
+  const { mutate: endGame } = useMutation({
+    mutationFn: async () => {
+      const payload: z.infer<typeof statsSchema> = {
+        attemptId: attempt.attemptId,
+        testQuestions: testQuestion,
+        timeEnded: new Date(now)
+      };
+      const response = await axios.post(`/api/stats`, payload);
+      setStatistics(response.data.statisiticsID)
+      return response.data;
+    },
+  });
+
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!hasEnded) {
@@ -102,7 +116,8 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
       onSuccess: () =>{
 
         if (questionIndex === testQuestion.length - 1) {
-          // TODO: end game
+          // We have to make a new post to create statistics page!
+          endGame();
           setHasEnded(true);
           return;
         }
@@ -111,7 +126,7 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
     })
 
 
-  }, [saveAnswer, questionIndex, testQuestion.length]); 
+  }, [saveAnswer, questionIndex, testQuestion.length, endGame]); 
 
 
   React.useEffect(() => {
