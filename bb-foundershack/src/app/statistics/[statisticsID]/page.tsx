@@ -9,6 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import ResultsCard from "@/components/statistics/ResultsCard";
 import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
+import QuestionsList from "@/components/statistics/QuestionsList";
 import StatisticsGraph from "@/components/statistics/StatisticsGraphs";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -102,7 +103,9 @@ const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
           <TabsContent value="stats">
             <StatisticsGraph statistics={statistics} />
           </TabsContent>
-          <TabsContent value="questions"></TabsContent>
+          <TabsContent value="questions">
+            <QuestionsList attempt={attempt} testQuestion={questions} />
+          </TabsContent>
         </Tabs>
       </div>
     </>
