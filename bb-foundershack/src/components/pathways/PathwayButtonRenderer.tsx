@@ -64,6 +64,7 @@ const PathwayButtonRenderer = ({
             node.index === currentTopicIndex &&
             index === currentQuestionIndex
           ) {
+            // Backend Example 3: API call
             const response = await axios.post(
               `/api/checkCorrectAnswers`,
               payload

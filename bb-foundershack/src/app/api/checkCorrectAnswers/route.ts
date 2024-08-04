@@ -19,6 +19,7 @@ const findKeyByValue = (topicMap: Record<string, number>, value: number): string
     return entry ? entry[0] : undefined;
 };
 
+// Backend Example 3: checkCorrectAnswers
 export async function POST(req: Request) {
   try {
     const { userId } = auth();

@@ -6,6 +6,7 @@ import { differenceInSeconds } from "date-fns";
 import { formatTimeDelta } from "@/lib/utils";
 import React from "react";
 
+// Backend Example 2: stats
 export async function POST(req: Request) {
   // TODO we will need to push timeCompleted into this so we can save it into attempt
 

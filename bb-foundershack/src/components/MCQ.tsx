@@ -82,6 +82,8 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
         attemptId: attempt.attemptId,
         userAnswer: userLetter,
       };
+
+      // Backend Example 1: API call
       const response = await axios.post(`/api/saveAnswer`, payload);
       return response.data;
     },
@@ -94,6 +96,8 @@ const MCQ = ({ attempt, testQuestion }: Props) => {
         testQuestions: testQuestion,
         timeEnded: new Date(now)
       };
+
+      // Backend Example 2: API call
       const response = await axios.post(`/api/stats`, payload);
       setStatistics(response.data.statisiticsID)
       return response.data;
