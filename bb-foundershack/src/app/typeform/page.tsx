@@ -1,13 +1,11 @@
-'use client'
-import TypeformEmbed from '@/components/Typeform'
-import React from 'react'
+"use client";
+import TypeformEmbed from "@/components/Typeform";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const page = (props: Props) => {
-  return (
-    <TypeformEmbed />
-  )
-}
+  return <TypeformEmbed />;
+};
 
-export default page
+export default page;

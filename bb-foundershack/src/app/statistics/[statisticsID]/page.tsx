@@ -20,6 +20,13 @@ type Props = {
   };
 };
 
+/**
+ * `StatisticsPage` is a server-side component that renders a detailed statistics page for a quiz attempt.
+ * It fetches the relevant statistics, attempt, and questions data, and displays this information in various cards and tabs.
+ *
+ * @param {Props} props - The component props containing the statisticsID from the URL parameters.
+ * @returns {JSX.Element} - A React component rendering the statistics summary and detailed views.
+ */
 const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
   const { userId } = auth();
 
@@ -39,7 +46,6 @@ const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
   }
 
   // We need to get the questions to display question list
-
   const attempt = await prisma.attempt.findUnique({
     where: { attemptId: statistics.attemptId },
     select: {
@@ -52,6 +58,7 @@ const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
     return redirect("/quiz");
   }
 
+  // Fetch question IDs associated with the quiz
   const questionIds = await prisma.testQuestionToQuiz.findMany({
     where: {
       QuizID: attempt.quizId,
@@ -61,9 +68,10 @@ const StatisticsPage = async ({ params: { statisticsID } }: Props) => {
     },
   });
 
-  // Change to idList so i can query it
+  // Convert question IDs to an array for querying
   const questionIdList = questionIds.map((q) => q.QuestionID);
 
+  // Fetch questions from the database based on the question ID list
   const questions = await prisma.testQuestion.findMany({
     where: {
       QuestionID: { in: questionIdList },
