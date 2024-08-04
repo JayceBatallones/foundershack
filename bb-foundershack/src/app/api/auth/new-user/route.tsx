@@ -15,18 +15,16 @@ export async function GET() {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  // Retrieve the current user's information
+  // Get user's information
   const user = await currentUser();
   if (!user) {
     return new NextResponse("User not exist", { status: 404 });
   }
 
-  // Check if the user exists in the database
   let dbUser = await prisma.user.findUnique({
     where: { clerkId: user.id },
   });
 
-  // If the user does not exist in the database, create a new user entry
   if (!dbUser) {
     dbUser = await prisma.user.create({
       data: {
@@ -38,7 +36,6 @@ export async function GET() {
     });
   }
 
-  // If the user could not be created, redirect to the home page
   if (!dbUser) {
     return new NextResponse(null, {
       status: 302, // 302 Found - temporary redirect
@@ -47,12 +44,12 @@ export async function GET() {
       },
     });
   }
-
-  // Redirect the user to the dashboard upon successful creation or retrieval
+  
+  // Perform your Route Handler's logic with the returned user object
   return new NextResponse(null, {
     status: 302, // 302 Found - temporary redirect
     headers: {
-      Location: "http://localhost:3000/dashboard",
+      Location: "http://localhost:3000/typeform",
     },
   });
 }
