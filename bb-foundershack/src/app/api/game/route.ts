@@ -1,21 +1,26 @@
 import { prisma } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+
+/**
+ * Handles the POST request to create a quiz attempt.
+ *
+ * @param {Request} req - The request object containing the quiz ID.
+ * @returns {Promise<NextResponse>} - The response object indicating the outcome of the attempt creation.
+ */
 export async function POST(req: Request) {
-
-  // So first we need to find the quiz and then generate an attempt with the quiz
+  // Parse the request body to get the quiz ID
   const body = await req.json();
-
   const quizId = body.quizId;
+
+  // Find the quiz based on the provided quiz ID
   const quiz = await prisma.quiz.findFirst({
     where: {
       quizId: quizId,
     },
   });
 
-  // Create an attempt instance
-  // 1. We need to get user ID
+  // Retrieve the current user's ID from the authentication service
   let clerkUserId;
   try {
     const clerkUser = await currentUser();
@@ -24,9 +29,8 @@ export async function POST(req: Request) {
     console.error("Error fetching current user:", error);
   }
 
-  // 2. Match this clerk id to a user id
+  // Match the Clerk user ID to the user ID in the database
   let user;
-
   try {
     user = await prisma.user.findFirst({
       where: {
@@ -40,9 +44,9 @@ export async function POST(req: Request) {
   if (user) {
     const userId = user.userId;
 
-    // Ensure userId and quizId are defined before making the attempt
+    // Ensure userId and quizId are defined before creating the attempt
     if (userId && quizId) {
-      // 3. Try to make attempt
+      // Create a new attempt for the user on the specified quiz
       try {
         const attempt = await prisma.attempt.create({
           data: {
@@ -51,15 +55,14 @@ export async function POST(req: Request) {
             currentQuestion: 0,
             isComplete: false,
             timeStarted: new Date(),
-
           },
         });
 
-   
-        return NextResponse.json({ attemptId: attempt.attemptId },
-          {status:200}
+        // Return the newly created attempt ID
+        return NextResponse.json(
+          { attemptId: attempt.attemptId },
+          { status: 200 }
         );
-
       } catch (error) {
         console.error("Error creating attempt:", error);
       }
@@ -70,6 +73,7 @@ export async function POST(req: Request) {
     console.error("User not found");
   }
 
+  // Handle the case where the quiz is not found
   if (!quiz) {
     return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
   }

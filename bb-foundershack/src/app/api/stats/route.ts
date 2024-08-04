@@ -7,8 +7,14 @@ import { formatTimeDelta } from "@/lib/utils";
 import React from "react";
 
 // Backend Example 2: stats
+/**
+ * Handles the POST request to save statistics after a quiz attempt.
+ *
+ * @param {Request} req - The request object containing the attempt details, test questions, and time ended.
+ * @returns {Promise<NextResponse>} - The response object indicating success or error.
+ */
 export async function POST(req: Request) {
-  // TODO we will need to push timeCompleted into this so we can save it into attempt
+  // TODO: We will need to push timeCompleted into this so we can save it into attempt
 
   try {
     // imports will be attemptId and testQuestions[]
@@ -17,7 +23,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { attemptId, testQuestions, timeEnded } = statsSchema.parse(body);
 
-    // ensure attempt is updated as complete
+    // Ensure attempt is updated as complete
     await prisma.attempt.update({
       where: {
         attemptId: attemptId,
@@ -28,6 +34,7 @@ export async function POST(req: Request) {
       },
     });
 
+    // Initialise containers for topics and subtopics statistics
     let topics: {
       [key: string]: {
         correctAnswerCount: number;
@@ -42,6 +49,7 @@ export async function POST(req: Request) {
     } = {};
     let counter: number = 0;
 
+    // Retrieve the attempt details
     const attempt = await prisma.attempt.findUnique({
       where: {
         attemptId: attemptId,
@@ -92,6 +100,7 @@ export async function POST(req: Request) {
       }
     }
 
+    // Update lastQuizDone for the user
     await prisma.user.update({
       where: {
         userId: userId,
@@ -102,9 +111,7 @@ export async function POST(req: Request) {
     });
 
     // 2. Matching attempt answer to ground truth answer
-
-    // 2.1 iterate correct amoun
-
+    // 2.1 Iterate correct amoun
     // 2.2 Alter json topics
 
     // Matching attempt answer to ground truth answer
@@ -145,7 +152,6 @@ export async function POST(req: Request) {
     });
 
     // 3. Calculate final percentage and time taken
-
     const percentage = Math.round((counter / testQuestions.length) * 100);
     let timeTakenSeconds;
     if (attempt.timeEnded) {
@@ -160,8 +166,8 @@ export async function POST(req: Request) {
 
     const baseDate = new Date(0);
     const timeTaken = new Date(baseDate.getTime() + timeTakenSeconds * 1000);
-    // 4. Create Statistics Instance
 
+    // 4. Create Statistics Instance
     const statistics = await prisma.statistics.create({
       data: {
         timeTaken: timeTaken,
@@ -176,6 +182,7 @@ export async function POST(req: Request) {
       console.log("Statistics was not made!");
       throw new Error(`Statistics could not be created`);
     }
+
     // 5. Return Statisitcs Instance
     return NextResponse.json(
       {
